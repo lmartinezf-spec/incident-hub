@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+
+# Secretos y configuración local (usar .env.example como plantilla)
+.env
+.env.*
+!.env.example
+
+# Builds, reportes, cobertura y paquetes del pipeline
+dist/
+coverage/
+reports/
+backend/public/
+paquete/
+release/
+version.env
+*.zip
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Runner autohospedado (si se instala dentro del repositorio por error)
+builds/
+config.toml

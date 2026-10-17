@@ -1,0 +1,82 @@
+# Copia cada push de GitHub (ramas y tags) al proyecto de GitLab, donde corre
+# el pipeline principal (.gitlab-ci.yml) en el runner autohospedado.
+# En las ramas de trabajo espera ese pipeline y refleja su resultado como check del PR.
+#
+# Configuración (Settings > Secrets and variables > Actions):
+#   secreto  GITLAB_TOKEN     token personal de GitLab con write_repository y read_api
+#   variable GITLAB_PROYECTO  ruta del proyecto en GitLab, p. ej. incident-hub-umg/incident-hub
+#   variable GITLAB_HOST      opcional, por defecto gitlab.com
+name: Sincronizar con GitLab
+
+on:
+  push:
+    branches: ['**']
+    tags: ['**']
+  delete:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sincronizar-${{ github.event.ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  espejo:
+    name: Espejo en GitLab
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Enviar a GitLab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GITLAB_HOST: ${{ vars.GITLAB_HOST || 'gitlab.com' }}
+          GITLAB_PROYECTO: ${{ vars.GITLAB_PROYECTO }}
+          EVENTO: ${{ github.event_name }}
+          REF_BORRADA: ${{ github.event.ref }}
+          TIPO_BORRADA: ${{ github.event.ref_type }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GITLAB_TOKEN}" ] || [ -z "${GITLAB_PROYECTO}" ]; then
+            echo "::error::Configura el secreto GITLAB_TOKEN y la variable GITLAB_PROYECTO (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          git remote add gitlab "https://oauth2:${GITLAB_TOKEN}@${GITLAB_HOST}/${GITLAB_PROYECTO}.git"
+
+          if [ "${EVENTO}" = "delete" ]; then
+            if [ "${TIPO_BORRADA}" = "tag" ]; then destino="refs/tags/${REF_BORRADA}"; else destino="refs/heads/${REF_BORRADA}"; fi
+            git push gitlab --delete "${destino}" || echo "::warning::${destino} no existía en GitLab."
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            git push --force gitlab "${GITHUB_REF}:${GITHUB_REF}"
+          else
+            git push --force gitlab "${GITHUB_SHA}:${GITHUB_REF}"
+          fi
+          echo "Sincronizado ${GITHUB_REF} -> https://${GITLAB_HOST}/${GITLAB_PROYECTO}" >> "${GITHUB_STEP_SUMMARY}"
+
+  pipeline:
+    name: Pipeline de GitLab
+    needs: espejo
+    if: github.event_name == 'push' && github.ref_type == 'branch' && github.ref_name != github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Esperar el resultado del pipeline principal
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          GITLAB_HOST: ${{ vars.GITLAB_HOST || 'gitlab.com' }}
+          GITLAB_PROYECTO: ${{ vars.GITLAB_PROYECTO }}
+        run: |
+          if [ ! -f .gitlab-ci.yml ] || [ ! -f devops/scripts/esperar-pipeline-gitlab.js ]; then
+            echo "Esta rama todavía no tiene .gitlab-ci.yml: no hay pipeline que esperar."
+            exit 0
+          fi
+          node devops/scripts/esperar-pipeline-gitlab.js

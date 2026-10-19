@@ -12,6 +12,16 @@ Formato basado en \[Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 
 
 
+\## \[0.2.0] - 2026-10-19
+
+
+
+\### Agregado
+
+\- Frontend React: login, listado con filtros, reporte, detalle con bitácora y acciones por rol, administración de usuarios.
+
+
+
 \## \[0.1.0] - 2026-10-18
 
 

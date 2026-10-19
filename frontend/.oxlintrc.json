@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "oxc"],
+  "globals": {
+    "__APP_VERSION__": "readonly"
+  },
+  "ignorePatterns": ["dist", "reports", "node_modules"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "eqeqeq": "error",
+    "no-unused-vars": "error"
+  }
+}

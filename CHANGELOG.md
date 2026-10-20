@@ -12,6 +12,28 @@ Formato basado en \[Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 
 
 
+\## \[0.3.0] - 2026-10-20
+
+
+
+\### Agregado
+
+\- Dashboard con indicadores (abiertos, críticos, sin asignar, resueltos, cerrados, tiempo promedio) y distribuciones por estado, prioridad, categoría y técnico.
+
+\- Pruebas automatizadas: Jest + supertest (backend) y Vitest (frontend).
+
+\- Pipeline principal en GitLab CI con runner autohospedado: restauración, lint, pruebas con reportes y cobertura, revisión de dependencias, build, paquete versionado y artefacto.
+
+\- Resultado del pipeline de GitLab como check de los PR de GitHub.
+
+
+
+\### Corregido
+
+\- Mapeo explícito del secreto de pruebas (`JWT\_SECRET\_TEST`) en el job de pruebas del backend.
+
+
+
 \## \[0.2.0] - 2026-10-19
 
 

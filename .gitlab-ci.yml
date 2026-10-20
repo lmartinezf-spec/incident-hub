@@ -1,0 +1,111 @@
+# IT Incident Hub — pipeline principal (GitLab CI/CD)
+#
+#   rama feature/* fix/* refactor/* -> versión, pruebas, dependencias y build
+#   main y tags vX.Y.Z              -> lo anterior + paquete versionado (artefacto)
+#
+# El repositorio vive en GitHub; GitHub Actions lo copia a GitLab en cada push
+# (.github/workflows/sincronizar-gitlab.yml) y ese push dispara este pipeline.
+# Todos los jobs corren en el runner autohospedado con el tag "incident-hub".
+# Detalle en docs/pipelines.md
+
+stages:
+  - validar
+  - pruebas
+  - seguridad
+  - empaquetar
+
+default:
+  tags:
+    - incident-hub
+
+variables:
+  GIT_DEPTH: "50"
+
+# Solo main y tags de versión generan el paquete.
+.entrega:
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\.\d+)?$/
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# ------------------------------------------------------------------ VALIDAR
+version:
+  stage: validar
+  script:
+    - ./devops/scripts/verificar-version.ps1
+  artifacts:
+    reports:
+      dotenv: version.env
+
+# ------------------------------------------------------------------ PRUEBAS
+backend:
+  stage: pruebas
+  needs: []
+  variables:
+    # Las pruebas usan su propio secreto. JWT_SECRET de staging/producción
+    # tiene ámbito de ambiente y nunca llega a este job.
+    JWT_SECRET: $JWT_SECRET_TEST
+  script:
+    - cd backend
+    - npm ci --no-audit --no-fund
+    - npm run lint
+    - npm run test:ci
+  coverage: '/Lines\s*:\s*(\d+(?:\.\d+)?)%/'
+  artifacts:
+    when: always
+    expire_in: 2 weeks
+    paths:
+      - backend/coverage/lcov-report/
+    reports:
+      junit: backend/reports/junit-backend.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: backend/coverage/cobertura-coverage.xml
+
+frontend:
+  stage: pruebas
+  needs: []
+  script:
+    - cd frontend
+    - npm ci --no-audit --no-fund
+    - npm run lint
+    - npm run test:ci
+    - npm run build
+  artifacts:
+    when: always
+    expire_in: 2 weeks
+    paths:
+      - frontend/dist/
+    reports:
+      junit: frontend/reports/junit-frontend.xml
+
+# ---------------------------------------------------------------- SEGURIDAD
+dependencias:
+  stage: seguridad
+  needs: []
+  script:
+    - node devops/scripts/auditoria.js --dir backend --out reports/auditoria-backend.md --falla-en high
+    - node devops/scripts/auditoria.js --dir frontend --out reports/auditoria-frontend.md --falla-en high
+  artifacts:
+    when: always
+    expire_in: 4 weeks
+    paths:
+      - reports/
+
+# --------------------------------------------------------------- EMPAQUETAR
+empaquetar:
+  stage: empaquetar
+  extends: .entrega
+  needs:
+    - job: version
+    - job: backend
+      artifacts: false
+    - job: frontend
+    - job: dependencias
+      artifacts: false
+  script:
+    - ./devops/scripts/empaquetar.ps1 -Version $env:APP_VERSION
+  artifacts:
+    name: incident-hub-$APP_VERSION
+    expire_in: 30 days
+    paths:
+      - release/

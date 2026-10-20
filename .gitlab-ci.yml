@@ -40,6 +40,10 @@ version:
 backend:
   stage: pruebas
   needs: []
+  variables:
+    # Las pruebas usan su propio secreto. JWT_SECRET de staging/producción
+    # tiene ámbito de ambiente y nunca llega a este job.
+    JWT_SECRET: $JWT_SECRET_TEST
   script:
     - cd backend
     - npm ci --no-audit --no-fund

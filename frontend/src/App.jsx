@@ -5,6 +5,7 @@ import { rutaInicial } from './navegacion'
 import { Layout } from './components/Layout'
 import { RutaProtegida } from './components/RutaProtegida'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 import Incidentes from './pages/Incidentes'
 import NuevoIncidente from './pages/NuevoIncidente'
 import DetalleIncidente from './pages/DetalleIncidente'
@@ -25,6 +26,9 @@ export default function App() {
           <Route element={<RutaProtegida />}>
             <Route element={<Layout />}>
               <Route index element={<Inicio />} />
+              <Route element={<RutaProtegida roles={['ADMIN', 'TECNICO']} />}>
+                <Route path="dashboard" element={<Dashboard />} />
+              </Route>
               <Route path="incidentes" element={<Incidentes />} />
               <Route path="incidentes/nuevo" element={<NuevoIncidente />} />
               <Route path="incidentes/:id" element={<DetalleIncidente />} />

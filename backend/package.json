@@ -1,6 +1,6 @@
 {
   "name": "incident-hub-backend",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "API REST de IT Incident Hub (Node.js + Express + PostgreSQL)",
   "private": true,
   "main": "server.js",

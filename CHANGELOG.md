@@ -5,6 +5,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [0.3.2] - 2026-10-21
+
+### Seguridad
+- TD-02: límite de 5 intentos fallidos de login por IP cada 15 minutos.
+
 ## [0.3.1] - 2026-10-21
 
 ### Corregido
@@ -32,4 +37,3 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 - Estructura del repositorio, espejo en GitLab, migraciones y scripts de datos iniciales.
 - Autenticación JWT con roles ADMIN, TECNICO y USUARIO; administración de usuarios.
 - API de incidentes: registro, consulta con filtros y paginación, asignación de técnico, flujo de estados, bitácora y comentarios.
-

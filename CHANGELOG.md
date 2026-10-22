@@ -5,6 +5,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [0.4.0] - 2026-10-22
+
+### Agregado
+- Workflow de GitHub Actions complementario en cada PR: lint, pruebas, build y revisión de dependencias nuevas.
+- Documentación de seguridad (secretos y controles) y de análisis de dependencias.
+
 ## [0.3.2] - 2026-10-21
 
 ### Seguridad

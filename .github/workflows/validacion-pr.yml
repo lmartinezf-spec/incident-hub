@@ -1,0 +1,95 @@
+# Workflow complementario al pipeline principal de GitLab: retroalimentación rápida
+# en cada PR (lint, pruebas, build y revisión de dependencias) en runners de GitHub.
+name: Validación de PR
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validacion-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend · lint y pruebas
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:ci
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET_TEST }}
+
+      - name: Publicar cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-backend
+          path: backend/coverage/lcov-report
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend · lint, pruebas y build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:ci
+      - run: npm run build
+
+  dependencias:
+    name: Revisión de dependencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: npm audit (backend)
+        run: node devops/scripts/auditoria.js --dir backend --out reports/auditoria-backend.md --falla-en high
+
+      - name: npm audit (frontend)
+        run: node devops/scripts/auditoria.js --dir frontend --out reports/auditoria-frontend.md --falla-en high
+
+      - name: Resumen en la ejecución
+        if: always()
+        run: cat reports/*.md >> "$GITHUB_STEP_SUMMARY"
+
+      # Compara las dependencias que agrega el PR contra la base de datos de avisos de GitHub.
+      # Requiere repositorio público (o GitHub Advanced Security en privados).
+      - name: Dependency review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+        continue-on-error: ${{ github.event.repository.private }}
+        with:
+          fail-on-severity: high

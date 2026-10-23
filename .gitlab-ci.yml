@@ -1,18 +1,23 @@
 # IT Incident Hub — pipeline principal (GitLab CI/CD)
 #
 #   rama feature/* fix/* refactor/* -> versión, pruebas, dependencias y build
-#   main y tags vX.Y.Z              -> lo anterior + paquete versionado (artefacto)
+#   main                            -> lo anterior + paquete + despliegue a Staging
+#   tag vX.Y.Z-rc.N                 -> lo anterior + Staging + release candidato
+#   tag vX.Y.Z                      -> lo anterior + Staging + Producción (aprobación) + release
 #
 # El repositorio vive en GitHub; GitHub Actions lo copia a GitLab en cada push
 # (.github/workflows/sincronizar-gitlab.yml) y ese push dispara este pipeline.
 # Todos los jobs corren en el runner autohospedado con el tag "incident-hub".
-# Detalle en docs/pipelines.md
+# Detalle en docs/pipelines.md y docs/estrategia-release.md
 
 stages:
   - validar
   - pruebas
   - seguridad
   - empaquetar
+  - staging
+  - produccion
+  - release
 
 default:
   tags:
@@ -21,7 +26,7 @@ default:
 variables:
   GIT_DEPTH: "50"
 
-# Solo main y tags de versión generan el paquete.
+# Solo main y tags de versión generan paquete y despliegues.
 .entrega:
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\.\d+)?$/
@@ -109,3 +114,60 @@ empaquetar:
     expire_in: 30 days
     paths:
       - release/
+
+# ------------------------------------------------------------------ STAGING
+deploy-staging:
+  stage: staging
+  extends: .entrega
+  needs:
+    - job: version
+    - job: empaquetar
+  resource_group: staging
+  environment:
+    name: staging
+    url: http://localhost:4001
+    deployment_tier: staging
+  script:
+    - ./devops/scripts/desplegar-ci.ps1 -Ambiente staging -Puerto 4001
+  after_script:
+    - ./devops/scripts/revertir-ci.ps1 -Ambiente staging
+
+# --------------------------------------------------------------- PRODUCCIÓN
+# Solo tags de versión final. Es manual y, en GitLab Ultimate, el ambiente
+# protegido "production" exige además la aprobación del Integrante 1.
+deploy-produccion:
+  stage: produccion
+  needs:
+    - job: version
+    - job: empaquetar
+    - job: deploy-staging
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+      when: manual
+  allow_failure: false
+  resource_group: production
+  environment:
+    name: production
+    url: http://localhost:4000
+    deployment_tier: production
+  script:
+    - ./devops/scripts/desplegar-ci.ps1 -Ambiente production -Puerto 4000
+  after_script:
+    - ./devops/scripts/revertir-ci.ps1 -Ambiente production
+
+# ------------------------------------------------------------------ RELEASE
+# rc: después de Staging. Final: después de Producción.
+release:
+  stage: release
+  needs:
+    - job: version
+    - job: empaquetar
+    - job: deploy-staging
+      artifacts: false
+    - job: deploy-produccion
+      artifacts: false
+      optional: true
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+(-rc\.\d+)?$/
+  script:
+    - ./devops/scripts/publicar-release.ps1 -Version $env:APP_VERSION

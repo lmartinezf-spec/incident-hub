@@ -5,6 +5,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [0.5.0] - 2026-10-23
+
+### Agregado
+- Etapas de despliegue a Staging y Producción con ambientes de GitLab.
+- Producción solo desde tags de versión, con ejecución manual y aprobación.
+- Scripts de despliegue, smoke test y rollback automático con PM2.
+- Release de GitLab con el paquete en el Package Registry.
+- Documentación de la estrategia de release.
+
 ## [0.4.0] - 2026-10-22
 
 ### Agregado

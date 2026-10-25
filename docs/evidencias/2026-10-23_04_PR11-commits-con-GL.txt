@@ -1,0 +1,74 @@
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git checkout main
+Already on 'main'
+Your branch is up to date with 'origin/main'.
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git pull
+Already up to date.
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git checkout -b feature/release-pipeline
+Switched to a new branch 'feature/release-pipeline'
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> ..\integrante.ps1 3
+Commits como: Luis - DevOps <lmartinezf@miumg.edu.gt>
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $final = '..\incident-hub-final'
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> foreach ($s in 'desplegar-ci.ps1','revertir-ci.ps1','deploy.ps1','smoke-test.ps1','rollback.ps1','publicar-release.ps1','notas-release.js') { Copy-Item "$final\devops\scripts\$s" devops\scripts\ }
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> Copy-Item "$final\devops\README.md" devops\
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> Copy-Item "$final\.gitlab-ci.yml" .
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> Copy-Item "$final\docs\estrategia-release.md" docs\
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git status
+On branch feature/release-pipeline
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .gitlab-ci.yml
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        devops/README.md
+        devops/scripts/deploy.ps1
+        devops/scripts/desplegar-ci.ps1
+        devops/scripts/notas-release.js
+        devops/scripts/publicar-release.ps1
+        devops/scripts/revertir-ci.ps1
+        devops/scripts/rollback.ps1
+        devops/scripts/smoke-test.ps1
+        docs/estrategia-release.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git add devops/scripts/deploy.ps1 devops/scripts/smoke-test.ps1 devops/scripts/rollback.ps1 devops/scripts/desplegar-ci.ps1 devops/scripts/revertir-ci.ps1 devops/README.md
+warning: in the working copy of 'devops/scripts/deploy.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'devops/scripts/desplegar-ci.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'devops/scripts/revertir-ci.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'devops/scripts/rollback.ps1', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'devops/scripts/smoke-test.ps1', LF will be replaced by CRLF the next time Git touches it
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git commit -m "ci: scripts de despliegue, smoke test y rollback GL-61"
+[feature/release-pipeline f1c0862] ci: scripts de despliegue, smoke test y rollback GL-61
+ 6 files changed, 355 insertions(+)
+ create mode 100644 devops/README.md
+ create mode 100644 devops/scripts/deploy.ps1
+ create mode 100644 devops/scripts/desplegar-ci.ps1
+ create mode 100644 devops/scripts/revertir-ci.ps1
+ create mode 100644 devops/scripts/rollback.ps1
+ create mode 100644 devops/scripts/smoke-test.ps1
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git add devops/scripts/publicar-release.ps1 devops/scripts/notas-release.js
+warning: in the working copy of 'devops/scripts/publicar-release.ps1', LF will be replaced by CRLF the next time Git touches it
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git commit -m "ci: publicación del paquete y del release en GitLab GL-61"
+[feature/release-pipeline e1887ec] ci: publicación del paquete y del release en GitLab GL-61
+ 2 files changed, 104 insertions(+)
+ create mode 100644 devops/scripts/notas-release.js
+ create mode 100644 devops/scripts/publicar-release.ps1
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git add .gitlab-ci.yml
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git commit -m "ci: etapas de staging, producción y release con aprobación GL-60 GL-52"
+[feature/release-pipeline a9055f8] ci: etapas de staging, producción y release con aprobación GL-60 GL-52
+ 1 file changed, 66 insertions(+), 4 deletions(-)
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git add docs/estrategia-release.md
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git commit -m "docs: estrategia de release GL-62"
+[feature/release-pipeline 12c895f] docs: estrategia de release GL-62
+ 1 file changed, 119 insertions(+)
+ create mode 100644 docs/estrategia-release.md
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git status
+On branch feature/release-pipeline
+nothing to commit, working tree clean
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub>

@@ -5,7 +5,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
-## [1.0.0] - 2026-10-24
+### Agregado
+- Índice de evidencias con capturas, contribuciones por integrante y guion de la demostración.
+- Enlaces reales del proyecto y cuentas del equipo en la documentación.
+
+## [1.0.0] - 2026-10-25
 
 ### Agregado
 - Primera versión estable para producción: despliegue con aprobación del Integrante 1, ejecución manual, smoke test y release con el paquete en el Package Registry.

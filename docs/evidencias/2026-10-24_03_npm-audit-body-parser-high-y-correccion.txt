@@ -1,0 +1,69 @@
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> cd "C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub\backend"
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub\backend> npm audit --omit=dev
+# npm audit report
+
+body-parser  2.0.0 - 2.3.0
+Severity: high
+body-parser vulnerable to Denial of Service via trailing bytes after a compressed request body - https://github.com/advisories/GHSA-27r3-jxmh-p828
+fix available via `npm audit fix`
+node_modules/body-parser
+
+1 high severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub\backend> cd ..
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> cd "C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub"
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> ..\integrante.ps1 1
+Commits como: Luis - Backend <luismtzfr005@gmail.com>
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> cd backend
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub\backend> npm audit fix
+
+changed 1 package, and audited 471 packages in 1s
+
+102 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub\backend> npm audit --omit=dev
+found 0 vulnerabilities
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub\backend> cd ..
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $ruta = (Resolve-Path docs\dependencias.md).Path
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $t = [IO.File]::ReadAllText($ruta) -replace "`r`n", "`n"
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $dep = @'
+>> ### Hallazgo DEP-02 · `body-parser` (alta, producción)
+>>
+>> | Campo | Valor |
+>> |---|---|
+>> | Aviso | [GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828) — denegación de servicio por bytes sobrantes después de un cuerpo comprimido |
+>> | Paquete vulnerable | `body-parser` 2.0.0 – 2.3.0, dependencia de `express` 5 |
+>> | Detección | 24 oct 2026, PR 12 (v1.0.0-rc.1): fallaron los checks *Revisión de dependencias* y *Pipeline de GitLab* (job `dependencias`) |
+>> | Registro | [Bug #65](https://gitlab.com/incident-hub-lmf/incident-hub/-/work_items/65) |
+>> | Corrección | `npm audit fix` sin `--force`: `body-parser` 2.3.0 → 2.4.0 dentro del rango de `express`; sin cambios en `package.json` |
+>> | Verificación | `npm audit --omit=dev` del backend sin vulnerabilidades; checks del PR 12 en verde |
+>>
+>> **Decisión: corregido antes del release**, porque es una dependencia de producción con severidad alta.
+>>
+>> '@
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> if ($t -match '(?m)^## Cómo agregar una dependencia') {
+>>   $t = $t -replace '(?m)^## Cómo agregar una dependencia', ($dep + '## Cómo agregar una dependencia')
+>> } else {
+>>   $t = $t.TrimEnd() + "`n`n" + $dep
+>> }
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> [IO.File]::WriteAllText($ruta, $t, [Text.UTF8Encoding]::new($false))
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $ruta = (Resolve-Path CHANGELOG.md).Path
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $t = [IO.File]::ReadAllText($ruta) -replace "`r`n", "`n"
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> $t = $t.Replace('solo Staging.' + "`n`n" + '## [0.5.0]', 'solo Staging.' + "`n`n" + '### Seguridad' + "`n" + '- `body-parser` 2.4.0 por el aviso GHSA-27r3-jxmh-p828 (denegación de servicio).' + "`n`n" + '## [0.5.0]')
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> [IO.File]::WriteAllText($ruta, $t, [Text.UTF8Encoding]::new($false))
+PS C:\Users\Micro Quetzal\Desktop\proyecto\incident-hub> git status
+On branch release/v1.0.0-rc.1
+Your branch is up to date with 'origin/release/v1.0.0-rc.1'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   CHANGELOG.md
+        modified:   backend/package-lock.json
+        modified:   docs/dependencias.md
+
+no changes added to commit (use "git add" and/or "git commit -a

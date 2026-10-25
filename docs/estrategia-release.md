@@ -69,7 +69,7 @@ La versión vive en `backend/package.json` y `frontend/package.json` (deben coin
 | v0.4.0 | 22 oct | Workflow complementario de GitHub Actions, seguridad y dependencias | — (paquete) |
 | v0.5.0 | 23 oct | Despliegues, smoke test, rollback y release | Staging (producción rechazada) |
 | v1.0.0-rc.1 | 24 oct | Candidato a release | Staging |
-| v1.0.0 | 24 oct | Primera versión estable | Staging → Producción |
+| v1.0.0 | 25 oct | Primera versión estable (PR 13 fusionado el 24 a las 23:59; tag, aprobación y producción el 25 a las 00:00–00:10) | Staging → Producción |
 
 ## Procedimiento de release
 

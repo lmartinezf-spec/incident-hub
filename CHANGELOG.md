@@ -5,6 +5,12 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [1.0.0-rc.1] - 2026-10-24
+
+### Cambiado
+- README con requisitos, instalación, ejecución, enlaces del proyecto y responsables del equipo.
+- Versión 1.0.0-rc.1 en backend y frontend: candidato a release, solo Staging.
+
 ## [0.5.0] - 2026-10-23
 
 ### Agregado

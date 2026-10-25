@@ -65,6 +65,18 @@ Producción: react, react-dom, react-router. Desarrollo: vite, @vitejs/plugin-re
 
 **Decisión: riesgo aceptado y monitoreado.** Degradar Jest a la versión 25 introduciría más vulnerabilidades y rompería la configuración actual; un `overrides` a `sprintf-js` no es posible porque no existe versión corregida. Se revisa en cada release y se actualizará Jest cuando el aviso tenga corrección.
 
+### Hallazgo DEP-02 · `body-parser` (alta, producción)
+
+| Campo | Valor |
+|---|---|
+| Aviso | [GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828) — denegación de servicio por bytes sobrantes después de un cuerpo comprimido |
+| Paquete vulnerable | `body-parser` 2.0.0 – 2.3.0, dependencia de `express` 5 |
+| Detección | 24 oct 2026, PR 12 (v1.0.0-rc.1): fallaron los checks *Revisión de dependencias* y *Pipeline de GitLab* (job `dependencias`) |
+| Registro | [Bug #65](https://gitlab.com/incident-hub-lmf/incident-hub/-/work_items/65) |
+| Corrección | `npm audit fix` sin `--force`: `body-parser` 2.3.0 → 2.4.0 dentro del rango de `express`; sin cambios en `package.json` |
+| Verificación | `npm audit --omit=dev` del backend sin vulnerabilidades; checks del PR 12 en verde |
+
+**Decisión: corregido antes del release**, porque es una dependencia de producción con severidad alta.
 ## Cómo agregar una dependencia
 
 1. Verificar mantenimiento (último release, descargas, issues abiertos) y licencia.

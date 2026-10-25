@@ -86,22 +86,23 @@ Escenario: **las pruebas del backend fallan en GitLab porque el job no recibe el
 | Síntoma | Pipeline de la rama `feature/pipeline-ci` en rojo en el job `backend`: las suites que cargan la API fallan con `Falta la variable de entorno requerida: JWT_SECRET` (las pruebas unitarias puras pasan). El check **Pipeline de GitLab** del PR queda en rojo y bloquea el merge |
 | Contexto | Localmente las pruebas pasan porque cada integrante tiene `backend/.env`; en el runner no existe `.env` (correcto: no se versiona) |
 | Diagnóstico | En GitLab la variable se llama `JWT_SECRET_TEST`, separada del `JWT_SECRET` de staging y producción (que tiene ámbito de ambiente y no llega al job de pruebas). La aplicación lee `JWT_SECRET`, así que el job debe mapearla |
-| Corrección | `variables: JWT_SECRET: $JWT_SECRET_TEST` en el job `backend` (commit `fix(ci): mapear JWT_SECRET_TEST en el job de pruebas GL-<bug>`) |
+| Corrección | `variables: JWT_SECRET: $JWT_SECRET_TEST` en el job `backend` (commit `fix(ci): mapear JWT_SECRET_TEST en el job de pruebas GL-64`) |
 | Resultado | El siguiente pipeline pasa; el valor aparece como `[MASKED]` si se imprime; el check del PR pasa a verde |
 | Aprendizaje | La configuración "falla rápido" hizo el error evidente en segundos; separar los secretos de prueba de los de los ambientes evita que una rama de trabajo reciba credenciales reales |
 
-Enlaces de evidencia (completar):
+Enlaces de evidencia:
 
-- Pipeline fallido: `<URL del pipeline en GitLab>`
-- Bug en GitLab: `GL-<n>`
-- Commit de corrección: `<URL del commit>`
-- Pipeline exitoso: `<URL del pipeline en GitLab>`
-- PR con el check en rojo y luego en verde: `<URL del PR en GitHub>`
+- Pipeline fallido: https://gitlab.com/incident-hub-lmf/incident-hub/-/pipelines/2968922229
+- Bug en GitLab: [#64](https://gitlab.com/incident-hub-lmf/incident-hub/-/work_items/64) (`GL-64`)
+- Commit de corrección: https://github.com/lmartinezf-spec/incident-hub/commit/1060313281af475bd2ec2a1b83dd81d1ba107caf
+- Pipeline exitoso: https://gitlab.com/incident-hub-lmf/incident-hub/-/pipelines/2968976908
+- PR con el check en rojo y luego en verde: https://github.com/lmartinezf-spec/incident-hub/pull/6
+- Capturas: [índice de evidencias](evidencias.md) (2026-10-20_04 a 2026-10-20_11)
 
 ## Insignias para el README
 
 ```markdown
-[![pipeline](https://gitlab.com/<grupo>/incident-hub/badges/main/pipeline.svg)](https://gitlab.com/<grupo>/incident-hub/-/pipelines)
-[![coverage](https://gitlab.com/<grupo>/incident-hub/badges/main/coverage.svg)](https://gitlab.com/<grupo>/incident-hub/-/pipelines)
-[![Validación de PR](https://github.com/<usuario>/incident-hub/actions/workflows/validacion-pr.yml/badge.svg)](https://github.com/<usuario>/incident-hub/actions/workflows/validacion-pr.yml)
+[![pipeline](https://gitlab.com/incident-hub-lmf/incident-hub/badges/main/pipeline.svg)](https://gitlab.com/incident-hub-lmf/incident-hub/-/pipelines)
+[![coverage](https://gitlab.com/incident-hub-lmf/incident-hub/badges/main/coverage.svg)](https://gitlab.com/incident-hub-lmf/incident-hub/-/pipelines)
+[![Validación de PR](https://github.com/lmartinezf-spec/incident-hub/actions/workflows/validacion-pr.yml/badge.svg)](https://github.com/lmartinezf-spec/incident-hub/actions/workflows/validacion-pr.yml)
 ```

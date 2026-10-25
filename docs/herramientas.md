@@ -25,6 +25,6 @@ El proyecto usa **GitHub** para el código y **GitLab** para la planificación y
 
 | Integrante | Rol | GitHub | GitLab | Permisos |
 |---|---|---|---|---|
-| Integrante 1 | Backend · Tech Lead | colaborador | Maintainer | Revisa PRs; **aprueba despliegues a producción** |
-| Integrante 2 | Frontend | colaborador | Developer | Revisa PRs |
-| Integrante 3 | DevOps · QA | dueño del repositorio | Owner del grupo | Configura runner, variables, ambientes y protecciones |
+| Integrante 1 | Backend · Tech Lead | `luismart005` (colaborador) | `AlbertoMUMG` (Maintainer) | Revisa PRs; **aprueba despliegues a producción** |
+| Integrante 2 | Frontend | `luisalbertomafra-lang` (colaborador) | `LuisFUMG` (Developer) | Revisa PRs |
+| Integrante 3 | DevOps · QA | `lmartinezf-spec` (dueño del repositorio) | `LuisUMG` (Owner del grupo) | Configura runner, variables, ambientes y protecciones |
